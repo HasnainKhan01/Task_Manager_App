@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const tasksRoutes = require('./routes/tasks');
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
+
+app.use('/api/tasks', tasksRoutes);
 
 app.get('/', (req, res) => {
     res.send('Task Manager API is running');
