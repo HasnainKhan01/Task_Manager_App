@@ -40,12 +40,16 @@ function App() {
       console.error('Error deleting task:', error);
     }
   };
-  
+
   return (
     <div className="App">
       <h1>Task Manager</h1>
       <TaskForm addTask={addTask} />
-      <TaskList tasks={tasks} />
+      <TaskList 
+      tasks={tasks} 
+      updateTask={updateTask} 
+      deleteTask={deleteTask}
+      />
     </div>
   );
 }
