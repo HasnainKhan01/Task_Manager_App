@@ -1,11 +1,6 @@
 import React from 'react';
 
-const TaskList = () => {
-  const tasks = [
-    { id: 1, title: 'Learn React', description: 'Build a front-end', status: 'To Do' },
-    { id: 2, title: 'Code Back-end', description: 'Set up APIs', status: 'In Progress' },
-  ];
-
+const TaskList = ({ tasks }) => {
   return (
     <div>
       <h2>Tasks</h2>
