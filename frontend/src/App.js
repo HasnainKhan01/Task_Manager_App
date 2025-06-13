@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import './App.css';
 import TaskList from './TaskList';
 import TaskForm from './TaskForm';
 
 function App() {
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Learn React', description: 'Build a front-end', status: 'To Do' },
-    { id: 2, title: 'Code Back-end', description: 'Set up APIs', status: 'In Progress' },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
-  const addTask = (newTask) => {
-    setTasks([...tasks, newTask]);
+  // Fetch tasks on component mount
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/tasks')
+      .then(response => setTasks(response.data))
+      .catch(error => console.error('Error fetching tasks:', error));
+  }, []);
+
+  const addTask = async (newTask) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/tasks', newTask);
+      setTasks([...tasks, response.data]);
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
   };
 
   return (
