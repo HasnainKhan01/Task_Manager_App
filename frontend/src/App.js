@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import Login from './Login';
@@ -10,13 +10,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    if (token) {
-      fetchTasks();
-    }
-  }, [token]);
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/tasks', {
         headers: { Authorization: `Bearer ${token}` },
@@ -24,41 +18,51 @@ function App() {
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
+      if (error.response?.status === 401) {
+        setToken('');
+        localStorage.removeItem('token');
+      }
     }
-  };
+  }, [token, setTasks, setToken]);
 
-  const addTask = async (newTask) => {
+  useEffect(() => {
+    if (token) {
+      fetchTasks();
+    }
+  }, [token, fetchTasks]);
+
+  const addTask = useCallback(async (newTask) => {
     try {
       const response = await axios.post('http://localhost:5000/api/tasks', newTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTasks([...tasks, response.data]);
+      setTasks(prevTasks => [...prevTasks, response.data]);
     } catch (error) {
       console.error('Error adding task:', error);
     }
-  };
+  }, [token]);
 
-  const updateTask = async (id, updatedTask) => {
+  const updateTask = useCallback(async (id, updatedTask) => {
     try {
       const response = await axios.put(`http://localhost:5000/api/tasks/${id}`, updatedTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTasks(tasks.map(task => task._id === id ? response.data : task));
+      setTasks(prevTasks => prevTasks.map(task => task._id === id ? response.data : task));
     } catch (error) {
       console.error('Error updating task:', error);
     }
-  };
+  }, [token]);
 
-  const deleteTask = async (id) => {
+  const deleteTask = useCallback(async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTasks(tasks.filter(task => task._id !== id));
+      setTasks(prevTasks => prevTasks.filter(task => task._id !== id));
     } catch (error) {
       console.error('Error deleting task:', error);
     }
-  };
+  }, [token]);
 
   const logout = () => {
     setToken('');
