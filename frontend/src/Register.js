@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Register = ({ setToken }) => {
+const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,14 +10,11 @@ const Register = ({ setToken }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', {
+      await axios.post('http://localhost:5000/api/users/register', {
         username,
         email,
         password,
       });
-      const { token } = response.data; 
-      setToken(token || null); 
-      if (token) localStorage.setItem('token', token);
       setError('');
       alert('Registration successful! Redirecting to login...');
       window.location.href = '/login';
