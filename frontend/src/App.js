@@ -9,8 +9,10 @@ import TaskForm from './TaskForm';
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchTasks = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await axios.get('http://localhost:5000/api/tasks', {
         headers: { Authorization: `Bearer ${token}` },
@@ -22,6 +24,8 @@ function App() {
         setToken('');
         localStorage.removeItem('token');
       }
+    } finally {
+      setLoading(false);
     }
   }, [token, setTasks, setToken]);
 
@@ -95,7 +99,11 @@ function App() {
                 token ? (
                   <>
                     <TaskForm addTask={addTask} />
-                    <TaskList tasks={tasks} updateTask={updateTask} deleteTask={deleteTask} />
+                    {loading ? (
+                      <p className="text-center mt-3">Loading tasks...</p>
+                    ) : (
+                      <TaskList tasks={tasks} updateTask={updateTask} deleteTask={deleteTask} />
+                    )}
                   </>
                 ) : (
                   <Navigate to="/login" />
