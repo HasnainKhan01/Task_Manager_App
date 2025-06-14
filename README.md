@@ -59,50 +59,42 @@ The Task Manager App allows users to register, log in, and manage personal tasks
   - Windows: Development environment.
 
 ## Progress
-The project was developed over two weeks, with the following milestones achieved by June 14, 2025:
+The project was developed over two days, with the following milestones achieved by June 14, 2025:
 
-### Week 1: Back-End Setup
-- **Day 1**: Initialized Node.js/Express server.
-  - Configured `server.js` with Express and CORS.
-  - Set up MongoDB Atlas connection with Mongoose.
-  - Created `.env` for sensitive data (`MONGODB_URI`, `JWT_SECRET`).
-- **Day 2**: Implemented user authentication.
-  - Built `/api/users/register` endpoint with bcrypt password hashing.
+### Day 1: Back-End Setup and Authentication
+- Initialized Node.js/Express server with `server.js`, configuring Express and CORS.
+- Set up MongoDB Atlas connection using Mongoose, with `.env` for sensitive data (`MONGODB_URI`, `JWT_SECRET`).
+- Implemented user authentication:
+  - Built `/api/users/register` endpoint with bcrypt for password hashing.
   - Created `/api/users/login` endpoint generating JWTs.
   - Added middleware (`auth.js`) to protect routes with JWT verification.
-- **Day 3**: Developed task management APIs.
+- Developed task management APIs:
   - Created `/api/tasks` endpoints for CRUD operations (GET, POST, PUT, DELETE).
-  - Integrated tasks with MongoDB `tasks` collection.
-  - Ensured all task routes require JWT authentication.
+  - Integrated tasks with MongoDB `tasks` collection, requiring JWT authentication.
 - **Challenges Overcome**:
-  - Fixed MongoDB connection errors by configuring `.env` correctly.
-  - Resolved bcrypt and Mongoose model issues.
-  - Addressed CORS errors for back-end API access.
+  - Fixed MongoDB connection errors by ensuring correct `MONGODB_URI` in `.env` and adding `dotenv`.
+  - Resolved bcrypt and Mongoose model issues for user registration.
+  - Addressed CORS errors by configuring `allowedHeaders` in `server.js`.
 
-### Week 2: Front-End and Authentication Integration
-- **Day 1**: Set up React front-end.
-  - Initialized React app with `create-react-app`.
-  - Created `TaskForm.js` and `TaskList.js` for task UI.
-  - Configured Axios for API calls.
-- **Day 2**: Implemented registration and login UI.
-  - Built `Register.js` and `Login.js` components.
-  - Integrated with `/api/users/register` and `/api/users/login` endpoints.
+### Day 2: Front-End Development and Authentication Integration
+- Set up React front-end with `create-react-app`.
+- Created `TaskForm.js` and `TaskList.js` for task management UI.
+- Built `Register.js` and `Login.js` components, integrated with `/api/users/register` and `/api/users/login` endpoints.
+- Configured `react-router-dom` in `App.js` for navigation (`/`, `/login`, `/register`).
+- Implemented authentication in front-end:
   - Stored JWT in `localStorage` for session persistence.
-- **Day 3**: Integrated authentication with front-end routing.
-  - Installed `react-router-dom` for navigation.
-  - Configured `App.js` with protected routes (task view at `/`, login at `/login`, register at `/register`).
-  - Added `useNavigate` in `Login.js` for redirect to `/` after login.
-  - Fixed `useEffect` dependency warnings in `App.js` using `useCallback`.
-  - Verified token handling in `App.js` for conditional rendering of task view.
+  - Used `useNavigate` in `Login.js` for redirect to `/` after login.
+  - Added protected routes in `App.js` to render task view only when authenticated.
+- Fixed `useEffect` dependency warnings in `App.js` using `useCallback`.
+- Removed deprecated Mongoose options (`useNewUrlParser`, `useUnifiedTopology`) in `server.js` to eliminate warnings.
 - **Challenges Overcome**:
-  - Fixed `react-scripts` and dependency issues.
-  - Resolved CORS errors by adding `Authorization` to `allowedHeaders` in `server.js`.
-  - Addressed MongoDB connection error due to missing `dotenv` configuration.
-  - Removed deprecated Mongoose options (`useNewUrlParser`, `useUnifiedTopology`) to eliminate warnings.
-  - Fixed login redirect issue by implementing `useNavigate`.
+  - Fixed `react-scripts` and dependency installation issues.
+  - Resolved CORS errors by adding `Authorization` to `allowedHeaders`.
+  - Addressed login redirect failure by implementing `useNavigate`.
+  - Verified token handling in `App.js` for seamless task view rendering.
 
 ## Screenshots
-*(Screenshots to be added after Day 4 UX polish. Planned:)*
+*(Screenshots to be added after Day 3 UX polish. Planned:)*
 - Login page with error handling.
 - Registration form.
 - Task view with form and task list.
