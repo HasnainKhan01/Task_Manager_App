@@ -73,25 +73,37 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <h1>Task Manager</h1>
-        {token && <button onClick={logout}>Logout</button>}
-        <Routes>
-          <Route path="/login" element={<Login setToken={setToken} />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/"
-            element={
-              token ? (
-                <>
-                  <TaskForm addTask={addTask} />
-                  <TaskList tasks={tasks} updateTask={updateTask} deleteTask={deleteTask} />
-                </>
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-        </Routes>
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+          <div className="container-fluid">
+            <a className="navbar-brand" href="/">Task Manager</a>
+            <div className="navbar-nav ms-auto">
+              {token && (
+                <button className="btn btn-outline-danger" onClick={logout}>
+                  Logout
+                </button>
+              )}
+            </div>
+          </div>
+        </nav>
+        <div className="container mt-4">
+          <Routes>
+            <Route path="/login" element={<Login setToken={setToken} />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/"
+              element={
+                token ? (
+                  <>
+                    <TaskForm addTask={addTask} />
+                    <TaskList tasks={tasks} updateTask={updateTask} deleteTask={deleteTask} />
+                  </>
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+          </Routes>
+        </div>
       </div>
     </Router>
   );

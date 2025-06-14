@@ -12,17 +12,35 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
   
   
   return (
-    <div>
-      <h2>Tasks</h2>
-      <ul>
-        {tasks.map(task => (
-          <li key={task.id}>
-            <strong>{task.title}</strong>: {task.description} ({task.status})
-            <button onClick={() => handleEdit(task)}>Edit</button>
-            <button onClick={() => deleteTask(task._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+    <div className="container mt-4">
+      <h3>Task List</h3>
+      {Array.isArray(tasks) && tasks.length === 0 ? (
+        <p className="text-muted">No tasks available.</p>
+      ) : (
+        <ul className="list-group">
+          {tasks.map(task => (
+            <li key={task._id} className="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <strong>{task.title}</strong>: {task.description} ({task.status})
+              </div>
+              <div>
+                <button
+                  className="btn btn-sm btn-outline-primary me-2"
+                  onClick={() => handleEdit(task)}
+                >
+                  Update
+                </button>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => deleteTask(task._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

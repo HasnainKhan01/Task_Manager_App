@@ -15,33 +15,53 @@ const TaskForm = ({ addTask }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Add Task</h2>
-            <div>
-                <label>Title:</label>
-                <input type="text" value={title} 
-                onChange={(e) => setTitle(e.target.value)} 
-                placeholder="Enter task title"
-                />
+    <div className="container mt-4">
+      <div className="card">
+        <div className="card-header">
+          <h3>Add Task</h3>
+        </div>
+        <div className="card-body">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="title" className="form-label">Title:</label>
+              <input
+                type="text"
+                id="title"
+                className="form-control"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
             </div>
-            <div>
-                <label>Description:</label>
-                <input type="text" value={description} 
-                onChange={(e) => setDescription(e.target.value)} 
-                placeholder="Enter task description"
-                />
+            <div className="mb-3">
+              <label htmlFor="description" className="form-label">Description:</label>
+              <textarea
+                id="description"
+                className="form-control"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows="4"
+              />
             </div>
-            <div>
-                <label>Status:</label>
-                <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                    <option value="To Do">To Do</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
-                </select>
+            <div className="mb-3">
+              <label htmlFor="status" className="form-label">Status:</label>
+              <select
+                id="status"
+                className="form-select"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done">Done</option>
+              </select>
             </div>
-            <button type="submit">Add Task</button>
-        </form>
-    );
+            <button type="submit" className="btn btn-primary">Add Task</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default TaskForm;
