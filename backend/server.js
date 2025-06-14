@@ -2,32 +2,39 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const tasksRoutes = require('./routes/tasks');
+const taskRoutes = require('./routes/tasks');
+const userRoutes = require('./routes/users');
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  allowedHeaders: ['Content-Type'], 
+}));
 app.use(express.json());
 
+
 mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-const userRoutes = require('./routes/users');
-app.use('/api/users', userRoutes);    
 
-app.use('/api/tasks', tasksRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
+
 
 app.get('/', (req, res) => {
-    res.send('Task Manager API is running');
+  res.send('Task Manager API is running!');
 });
 
+
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
