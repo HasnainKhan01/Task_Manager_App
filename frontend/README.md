@@ -1,70 +1,119 @@
-# Getting Started with Create React App
+# Task Manager App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full stack web application for managing tasks with secure user authentication, built with React, Node.js, Express, and MongoDB. This project demonstrates proficiency in modern web development, RESTful API design, and cybersecurity practices, including JWT-based authentication and password hashing. Developed as part of a CS/cybersecurity portfolio to showcase skills aligned with CompTIA Security+ certification goals.
 
-## Available Scripts
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Progress](#progress)
+- [Screenshots](#screenshots)
+- [Setup Instructions](#setup-instructions)
+- [Future Improvements](#future-improvements)
+- [Contact](#contact)
+- [License](#license)
 
-In the project directory, you can run:
+## Project Overview
+The Task Manager App allows users to register, log in, and manage personal tasks (create, read, update, delete) through a secure, user-friendly interface. Built with a React front-end and Node.js/Express back-end, it uses MongoDB Atlas for persistent storage and implements JWT-based authentication to protect routes. The project emphasizes secure coding practices, error handling, and a seamless user experience, making it a strong addition to a CS/cybersecurity portfolio.
 
-### `npm start`
+## Features
+- **User Authentication**:
+  - Secure registration and login with email and password.
+  - Passwords hashed using bcrypt for enhanced security.
+  - JSON Web Tokens (JWT) for session management and protected API routes.
+  - Automatic redirect to task view after login.
+  - Logout functionality clearing session data.
+- **Task Management**:
+  - Create tasks with title, description, and status (To Do, In Progress, Done).
+  - View all tasks in a list, with options to update status or delete.
+  - Persistent storage in MongoDB Atlas.
+- **Security**:
+  - Protected API routes requiring JWT authentication.
+  - CORS configured to allow only trusted origins (`http://localhost:3000`).
+  - Environment variables for sensitive data (MongoDB URI, JWT secret).
+- **Front-End**:
+  - Responsive routing with React Router for navigation between register, login, and task views.
+  - Task form and list components for intuitive task management.
+- **Back-End**:
+  - RESTful API endpoints for user and task operations.
+  - MongoDB Atlas integration for cloud-based data storage.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tech Stack
+- **Front-End**:
+  - React: Component-based UI development.
+  - React Router: Client-side routing.
+  - Axios: HTTP requests to back-end APIs.
+- **Back-End**:
+  - Node.js: Server-side runtime.
+  - Express: Web framework for RESTful APIs.
+  - Mongoose: MongoDB object modeling.
+  - MongoDB Atlas: Cloud database.
+- **Security**:
+  - bcrypt: Password hashing.
+  - jsonwebtoken: JWT authentication.
+  - CORS: Cross-origin resource sharing control.
+- **Tools**:
+  - Postman: API testing.
+  - Git/GitHub: Version control.
+  - MongoDB Atlas: Database management.
+  - Windows: Development environment.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Progress
+The project was developed over two days, with the following milestones achieved by June 14, 2025:
 
-### `npm test`
+### Day 1: Back-End Setup and Authentication
+- Initialized Node.js/Express server with `server.js`, configuring Express and CORS.
+- Set up MongoDB Atlas connection using Mongoose, with `.env` for sensitive data (`MONGODB_URI`, `JWT_SECRET`).
+- Implemented user authentication:
+  - Built `/api/users/register` endpoint with bcrypt for password hashing.
+  - Created `/api/users/login` endpoint generating JWTs.
+  - Added middleware (`auth.js`) to protect routes with JWT verification.
+- Developed task management APIs:
+  - Created `/api/tasks` endpoints for CRUD operations (GET, POST, PUT, DELETE).
+  - Integrated tasks with MongoDB `tasks` collection, requiring JWT authentication.
+- **Challenges Overcome**:
+  - Fixed MongoDB connection errors by ensuring correct `MONGODB_URI` in `.env` and adding `dotenv`.
+  - Resolved bcrypt and Mongoose model issues for user registration.
+  - Addressed CORS errors by configuring `allowedHeaders` in `server.js`.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Day 2: Front-End Development and Authentication Integration
+- Set up React front-end with `create-react-app`.
+- Created `TaskForm.js` and `TaskList.js` for task management UI.
+- Built `Register.js` and `Login.js` components, integrated with `/api/users/register` and `/api/users/login` endpoints.
+- Configured `react-router-dom` in `App.js` for navigation (`/`, `/login`, `/register`).
+- Implemented authentication in front-end:
+  - Stored JWT in `localStorage` for session persistence.
+  - Used `useNavigate` in `Login.js` for redirect to `/` after login.
+  - Added protected routes in `App.js` to render task view only when authenticated.
+- Fixed `useEffect` dependency warnings in `App.js` using `useCallback`.
+- Removed deprecated Mongoose options (`useNewUrlParser`, `useUnifiedTopology`) in `server.js` to eliminate warnings.
+- **Challenges Overcome**:
+  - Fixed `react-scripts` and dependency installation issues.
+  - Resolved CORS errors by adding `Authorization` to `allowedHeaders`.
+  - Addressed login redirect failure by implementing `useNavigate`.
+  - Verified token handling in `App.js` for seamless task view rendering.
 
-### `npm run build`
+## Screenshots
+*(Screenshots to be added after Day 3 UX polish. Planned:)*
+- Login page with error handling.
+- Registration form.
+- Task view with form and task list.
+- MongoDB Atlas dashboard showing `tasks` collection.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+*Placeholder*: See `/screenshots` folder or live demo (to be deployed).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Setup Instructions
+To run the Task Manager App locally on a Windows machine:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
+- Node.js (v16 or later)
+- MongoDB Atlas account
+- Git
+- Text editor (e.g., VS Code)
+- Postman (optional, for API testing)
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Steps
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/<your-username>/task-manager-app.git
+   cd task-manager-app
