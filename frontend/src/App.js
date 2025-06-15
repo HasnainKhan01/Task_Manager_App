@@ -10,6 +10,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -18,8 +19,10 @@ function App() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(response.data);
+      setError('');
     } catch (error) {
       console.error('Error fetching tasks:', error);
+      setError(error.response?.data?.message || 'Failed to fetch tasks');
       if (error.response?.status === 401) {
         setToken('');
         localStorage.removeItem('token');
@@ -41,8 +44,10 @@ function App() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(prevTasks => [...prevTasks, response.data]);
+      setError('');
     } catch (error) {
       console.error('Error adding task:', error);
+      setError(error.response?.data?.message || 'Failed to add task');
     }
   }, [token]);
 
@@ -52,8 +57,10 @@ function App() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(prevTasks => prevTasks.map(task => task._id === id ? response.data : task));
+      setError('');
     } catch (error) {
       console.error('Error updating task:', error);
+      setError(error.response?.data?.message || 'Failed to update task');
     }
   }, [token]);
 
@@ -62,9 +69,16 @@ function App() {
       await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTasks(prevTasks => prevTasks.filter(task => task._id !== id));
+      setTasks(prevTasks => {
+        const updatedTasks = prevTasks.filter(task => task._id !== id);
+        console.log('Deleted task ID:', id, 'Updated tasks:', updatedTasks); // Debug
+        return updatedTasks;
+      });
+      setError('');
     } catch (error) {
       console.error('Error deleting task:', error);
+      setError(error.response?.data?.message || 'Failed to delete task');
+      throw error;
     }
   }, [token]);
 

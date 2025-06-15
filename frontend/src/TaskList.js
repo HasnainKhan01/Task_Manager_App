@@ -1,6 +1,8 @@
 import React from 'react';
 
 const TaskList = ({ tasks, updateTask, deleteTask }) => {
+  const [deletingTasks, setDeletingTasks] = React.useState({});
+
   const handleEdit = (task) => {
     const nextStatus = {
       'To Do': 'In Progress',
@@ -9,6 +11,18 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
     };
     updateTask(task._id, { status: nextStatus[task.status] });
   };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    setDeletingTasks(prev => ({ ...prev, [id]: true }));
+    try {
+      await deleteTask(id);
+    } catch (error) {
+      alert('Failed to delete task. Please try again.');
+    } finally {
+      setDeletingTasks(prev => ({ ...prev, [id]: false }));
+    }
+  }
   
   
   return (
@@ -32,9 +46,14 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
                 </button>
                 <button
                   className="btn btn-sm btn-outline-danger"
-                  onClick={() => deleteTask(task._id)}
+                  onClick={() => handleDelete(task._id)}
+                  disabled={deletingTasks[task._id]}
                 >
-                  Delete
+                  {deletingTasks[task._id] ? (
+                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  ) : (
+                    'Delete'
+                  )}
                 </button>
               </div>
             </li>

@@ -1,56 +1,70 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const auth = require('../middleware/auth');
 
-router.get('/', async (req, res) => {
-    try {
-        const tasks = await Task.find();
-        res.json(tasks);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-router.post('/', async (req, res) => {
-    const task = new Task({
-        title: req.body.title,
-        description: req.body.description,
-        status: req.body.status,
-    });
-    try {
-        const newTask = await task.save();
-        res.status(201).json(newTask);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-router.put('/:id', async (req, res) => {
-    try {
-        const task = await Task.findById(req.params.id);
-        if (!task) return res.status(404).json({ message: 'Task not found'});
-
-        task.title = req.body.title || task.title;
-        task.description = req.body.description || task.description;
-        task.status = req.body.status || task.status;
-
-        const updatedTask = await task.save();
-        res.json(updatedTask);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-router.delete('/:id', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+    console.log('GET tasks, User ID:', req.user.id);
+    const tasks = await Task.find({ user: req.user.id });
+    res.json(tasks);
+  } catch (err) {
+    console.error('GET tasks error:', err); 
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.post('/', auth, async (req, res) => {
+    try {
+    console.log('POST task, User ID:', req.user.id, 'Body:', req.body);
+  const task = new Task({
+    title: req.body.title,
+    description: req.body.description || '',
+    status: req.body.status,
+    user: req.user.id, 
+  });
+    const newTask = await task.save();
+    res.status(201).json(newTask);
+  } catch (err) {
+    console.error('POST task error:', err); 
+    res.status(400).json({ message: err.message || 'Failed to create task' });
+  }
+});
+
+router.put('/:id', auth, async (req, res) => {
+  try {
+    console.log('PUT task ID:', req.params.id, 'User ID:', req.user.id);
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+    const task = await Task.findOne({ _id: req.params.id, user: req.user.id });
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    await task.remove();
+    task.title = req.body.title || task.title;
+    task.description = req.body.description || task.description;
+    task.status = req.body.status || task.status;
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (err) {
+    console.error('PUT task error:', err); 
+    res.status(400).json({ message: err.message || 'Failed to update task' });
+  }
+});
+
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    console.log('Deleting task ID:', req.params.id, 'User ID:', req.user.id);
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+    const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+    if (!task) return res.status(404).json({ message: 'Task not found' });
     res.json({ message: 'Task deleted' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('DELETE task error:', err); // Debug
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
