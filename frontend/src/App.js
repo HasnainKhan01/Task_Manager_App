@@ -3,14 +3,15 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import axios from 'axios';
 import Login from './Login';
 import Register from './Register';
-import TaskList from './TaskList';
 import TaskForm from './TaskForm';
+import TaskList from './TaskList';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -21,32 +22,49 @@ function App() {
       setTasks(response.data);
       setError('');
     } catch (error) {
-      console.error('Error fetching tasks:', error);
-      setError(error.response?.data?.message || 'Failed to fetch tasks');
+      console.error('Error fetching tasks:', error.response?.data || error);
+      setError(error.response?.data?.message || 'Failed to load tasks');
       if (error.response?.status === 401) {
         setToken('');
         localStorage.removeItem('token');
+        setUsername('');
       }
     } finally {
       setLoading(false);
     }
-  }, [token, setTasks, setToken]);
+  }, [token]);
+
+  const fetchUsername = useCallback(async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/users/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsername(response.data.username);
+    } catch (error) {
+      console.error('Error fetching username:', error.response?.data || error);
+      setUsername('');
+    }
+  }, [token]);
 
   useEffect(() => {
     if (token) {
       fetchTasks();
+      fetchUsername();
+    } else {
+      setUsername('');
     }
-  }, [token, fetchTasks]);
+  }, [token, fetchTasks, fetchUsername]);
 
   const addTask = useCallback(async (newTask) => {
     try {
+      console.log('Adding task:', newTask, 'Token:', token);
       const response = await axios.post('http://localhost:5000/api/tasks', newTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(prevTasks => [...prevTasks, response.data]);
       setError('');
     } catch (error) {
-      console.error('Error adding task:', error);
+      console.error('Error adding task:', error.response?.data || error);
       setError(error.response?.data?.message || 'Failed to add task');
     }
   }, [token]);
@@ -59,7 +77,7 @@ function App() {
       setTasks(prevTasks => prevTasks.map(task => task._id === id ? response.data : task));
       setError('');
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error('Error updating task:', error.response?.data || error);
       setError(error.response?.data?.message || 'Failed to update task');
     }
   }, [token]);
@@ -71,12 +89,12 @@ function App() {
       });
       setTasks(prevTasks => {
         const updatedTasks = prevTasks.filter(task => task._id !== id);
-        console.log('Deleted task ID:', id, 'Updated tasks:', updatedTasks); // Debug
+        console.log('Deleted task ID:', id, 'Updated tasks:', updatedTasks);
         return updatedTasks;
       });
       setError('');
     } catch (error) {
-      console.error('Error deleting task:', error);
+      console.error('Error deleting task:', error.response?.data || error);
       setError(error.response?.data?.message || 'Failed to delete task');
       throw error;
     }
@@ -84,6 +102,7 @@ function App() {
 
   const logout = () => {
     setToken('');
+    setUsername('');
     localStorage.removeItem('token');
     window.location.href = '/login';
   };
@@ -93,7 +112,9 @@ function App() {
       <div className="App">
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
           <div className="container-fluid">
-            <a className="navbar-brand" href="/">Task Manager</a>
+            <a className="navbar-brand" href="/">
+              Task Manager {username && `(${username})`}
+            </a>
             <div className="navbar-nav ms-auto">
               {token && (
                 <button className="btn btn-outline-danger" onClick={logout}>
@@ -104,6 +125,7 @@ function App() {
           </div>
         </nav>
         <div className="container mt-4">
+          {error && <div className="alert alert-danger">{error}</div>}
           <Routes>
             <Route path="/login" element={<Login setToken={setToken} />} />
             <Route path="/register" element={<Register />} />
