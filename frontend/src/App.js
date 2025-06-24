@@ -6,6 +6,8 @@ import Register from './Register';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [tasks, setTasks] = useState([]);
@@ -16,7 +18,7 @@ function App() {
   const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/tasks', {
+      const response = await axios.get(`${API_URL}/api/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(response.data);
@@ -36,7 +38,7 @@ function App() {
 
   const fetchUsername = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users/me', {
+      const response = await axios.get(`${API_URL}/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsername(response.data.username);
@@ -58,7 +60,7 @@ function App() {
   const addTask = useCallback(async (newTask) => {
     try {
       console.log('Adding task:', newTask, 'Token:', token);
-      const response = await axios.post('http://localhost:5000/api/tasks', newTask, {
+      const response = await axios.post(`${API_URL}/api/tasks`, newTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(prevTasks => [...prevTasks, response.data]);
@@ -71,7 +73,7 @@ function App() {
 
   const updateTask = useCallback(async (id, updatedTask) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/tasks/${id}`, updatedTask, {
+      const response = await axios.put(`${API_URL}/api/tasks/${id}`, updatedTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(prevTasks => prevTasks.map(task => task._id === id ? response.data : task));
@@ -84,7 +86,7 @@ function App() {
 
   const deleteTask = useCallback(async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+      await axios.delete(`${API_URL}/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(prevTasks => {
