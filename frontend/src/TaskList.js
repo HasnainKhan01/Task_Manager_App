@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
 const TaskList = ({ tasks, updateTask, deleteTask }) => {
-  const [deletingTasks, setDeletingTasks] = React.useState({});
+  const [deletingTasks, setDeletingTasks] = useState({});
   const [sortOrder, setSortOrder] = useState('default');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [taskToDelete, setTasktoDelete] = useState(null);
+
 
   const handleEdit = (task) => {
     const nextStatus = {
@@ -14,17 +18,30 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
     updateTask(task._id, { status: nextStatus[task.status] });
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
-    setDeletingTasks(prev => ({ ...prev, [id]: true }));
+  const handleDeleteClick = (id) => {
+    setTasktoDelete(id);
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!taskToDelete) return;
+    setDeletingTasks(prev => ({ ...prev, [taskToDelete]: true }));
     try {
-      await deleteTask(id);
+      await deleteTask(taskToDelete);
     } catch (error) {
       alert('Failed to delete task. Please try again.');
     } finally {
-      setDeletingTasks(prev => ({ ...prev, [id]: false }));
+      setDeletingTasks(prev => ({ ...prev, [taskToDelete]: false }));
+      setShowConfirm(false);
+      setTasktoDelete(null);
     }
-  }
+    };
+
+    const handleCancelDelete = () => {
+      setShowConfirm(false);
+      setTasktoDelete(null);
+    };
+  
 
   const sortedTasks = [...tasks].sort((a, b) => {
     if (sortOrder === 'default') return 0; // Original order
@@ -40,36 +57,6 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
   return (
     <div className="container mt-4">
       <h3>Task List</h3>
-      <div className="mb-3 d-flex justify-content-between">
-        <div>
-          <label htmlFor="filterStatus" className="form-label me-2">Filter:</label>
-          <select
-            id="filterStatus"
-            className="form-select d-inline-block"
-            style={{ width: 'auto' }}
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">All</option>
-            <option value="To Do">To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="sortOrder" className="form-label me-2">Sort:</label>
-          <select
-            id="sortOrder"
-            className="form-select d-inline-block"
-            style={{ width: 'auto' }}
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
-            <option value="default">Default</option>
-            <option value="status">By Status</option>
-          </select>
-        </div>
-      </div>
       {Array.isArray(filteredTasks) && filteredTasks.length === 0 ? (
         <p className="text-muted">No tasks available.</p>
       ) : (
@@ -89,7 +76,7 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
                 </button>
                 <button
                   className="btn btn-sm btn-outline-danger"
-                  onClick={() => handleDelete(task._id)}
+                  onClick={() => handleDeleteClick(task._id)}
                   disabled={deletingTasks[task._id]}
                 >
                   {deletingTasks[task._id] ? (
@@ -103,6 +90,31 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
           ))}
         </ul>
       )}
+
+      <Modal show={showConfirm} onHide={handleCancelDelete} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this task?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelDelete}>
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleConfirmDelete}
+            disabled={deletingTasks[taskToDelete]}
+          >
+            {deletingTasks[taskToDelete] ? (
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            ) : (
+              'Delete'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
