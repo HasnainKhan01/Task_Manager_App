@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const auth = require('../middleware/auth');
+const { body, validationResult } = require('express-validator');
 
 router.get('/', auth, async (req, res) => {
   try {
@@ -15,8 +16,14 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
-    try {
+router.post('/', auth, [
+  body('title').trim().escape().notEmpty().withMessage('Title required'),
+  body('description').trim().escape(),
+  body('status').isIn(['To Do', 'In Progress', 'Done']).withMessage('Invalid status')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg });
+  try {
     console.log('POST task, User ID:', req.user.id, 'Body:', req.body);
   const task = new Task({
     title: req.body.title,
@@ -32,7 +39,13 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, [
+  body('title').optional().trim().escape(),
+  body('description').optional().trim().escape(),
+  body('status').optional().isIn(['To Do', 'In Progress', 'Done']).withMessage('Invalid status')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg });
   try {
     console.log('PUT task ID:', req.params.id, 'User ID:', req.user.id);
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
