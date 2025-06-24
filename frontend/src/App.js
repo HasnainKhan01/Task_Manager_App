@@ -6,7 +6,7 @@ import Register from './Register';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
