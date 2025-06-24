@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const TaskList = ({ tasks, updateTask, deleteTask }) => {
   const [deletingTasks, setDeletingTasks] = React.useState({});
+  const [sortOrder, setSortOrder] = useState('default');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const handleEdit = (task) => {
     const nextStatus = {
@@ -23,16 +25,56 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
       setDeletingTasks(prev => ({ ...prev, [id]: false }));
     }
   }
+
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (sortOrder === 'default') return 0; // Original order
+    const statusOrder = { 'To Do': 1, 'In Progress': 2, 'Done': 3 };
+    return statusOrder[a.status] - statusOrder[b.status];
+  });
+
+  const filteredTasks = filterStatus === 'all'
+    ? sortedTasks
+    : sortedTasks.filter(task => task.status === filterStatus);
   
   
   return (
     <div className="container mt-4">
       <h3>Task List</h3>
-      {Array.isArray(tasks) && tasks.length === 0 ? (
+      <div className="mb-3 d-flex justify-content-between">
+        <div>
+          <label htmlFor="filterStatus" className="form-label me-2">Filter:</label>
+          <select
+            id="filterStatus"
+            className="form-select d-inline-block"
+            style={{ width: 'auto' }}
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="To Do">To Do</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sortOrder" className="form-label me-2">Sort:</label>
+          <select
+            id="sortOrder"
+            className="form-select d-inline-block"
+            style={{ width: 'auto' }}
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="default">Default</option>
+            <option value="status">By Status</option>
+          </select>
+        </div>
+      </div>
+      {Array.isArray(filteredTasks) && filteredTasks.length === 0 ? (
         <p className="text-muted">No tasks available.</p>
       ) : (
         <ul className="list-group">
-          {tasks.map(task => (
+          {filteredTasks.map(task => (
             <li key={task._id} className="list-group-item d-flex justify-content-between align-items-center">
               <div>
                 <strong>{task.title}</strong>: {task.description} ({task.status})
@@ -41,6 +83,7 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
                 <button
                   className="btn btn-sm btn-outline-primary me-2"
                   onClick={() => handleEdit(task)}
+                  disabled={deletingTasks[task._id]}
                 >
                   Update
                 </button>
