@@ -57,6 +57,35 @@ const TaskList = ({ tasks, updateTask, deleteTask }) => {
   return (
     <div className="container mt-4">
       <h3>Task List</h3>
+
+      {/* Filter and Sort Controls */}
+      <div className="d-flex mb-3">
+        <div className="me-3">
+          <label className="me-2">Filter:</label>
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            className="form-select d-inline-block w-auto"
+          >
+            <option value="all">All</option>
+            <option value="To Do">To Do</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div>
+          <label className="me-2">Sort:</label>
+          <select
+            value={sortOrder}
+            onChange={e => setSortOrder(e.target.value)}
+            className="form-select d-inline-block w-auto"
+          >
+            <option value="default">Default</option>
+            <option value="status">By Status</option>
+          </select>
+        </div>
+      </div>
+
       {Array.isArray(filteredTasks) && filteredTasks.length === 0 ? (
         <p className="text-muted">No tasks available.</p>
       ) : (
